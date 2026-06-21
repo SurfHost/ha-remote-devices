@@ -3,7 +3,7 @@
 [![Validate](https://github.com/SurfHost/ha-remote-devices/actions/workflows/validate.yml/badge.svg)](https://github.com/SurfHost/ha-remote-devices/actions/workflows/validate.yml)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 
-Custom Home Assistant integration that creates **button**, **media_player**, **fan**, and **light** entities to control IR and RF devices through the Home Assistant 2026.5 `infrared` and `radio_frequency` platforms.
+Custom Home Assistant integration that creates **button**, **climate**, **media_player**, **fan**, and **light** entities to control IR and RF devices through the Home Assistant 2026.5 `infrared` and `radio_frequency` platforms.
 
 ## What does this do?
 
@@ -12,6 +12,7 @@ This is a **consumer integration** for the HA `infrared` and `radio_frequency` p
 Set it up, pick your device type, pick the matching emitter (the integration filters automatically based on whether the device uses IR or RF), and you get appropriate HA-native entities:
 
 - A **media_player** entity for TVs and AV receivers (power, volume, mute)
+- A **climate** entity for air conditioners (HVAC mode, target temperature, fan speed, swing)
 - A **fan** entity for ceiling fans (speed, preset modes, direction)
 - A **light** entity for lamps (on/off)
 - **Button** entities for everything else
@@ -27,6 +28,7 @@ Set it up, pick your device type, pick the matching emitter (the integration fil
 | Sharp TV (Aquos) | IR — Sharp (addr 0x01) | media_player + 20 buttons |
 | Denon AVR Receiver | IR — Denon (addr 0x02) | media_player + 16 buttons |
 | Audioengine A5+ Speakers | IR — extended NEC (addr 0x00FD) | media_player (volume + mute) + 3 buttons |
+| Tristar PD-8779 Air Conditioner | IR — ZH/LT-01 | climate (mode, temp, fan, swing) |
 | Philips RGBIC Lamp | IR — NEC (addr 0x00) | 11 buttons |
 | Amino Kamai 7X STB | IR — RC6 (raw learned) | 8 buttons |
 | Raw Test | IR — raw burst | 1 button |
@@ -81,6 +83,19 @@ The Airwit ceiling fan is exposed as **three entities under one device**, so you
 
 This means voice assistants ("Alexa, set ceiling fan to medium"), Lovelace fan/light cards, scenes, and standard automations all work without scripts.
 
+## Tristar PD-8779 Air Conditioner
+
+The Tristar PD-8779 portable AC is exposed as a single **climate** entity using the **ZH/LT-01** protocol (the same protocol used by many generic portable ACs and supported by ESPHome's `climate_ir` and HeatpumpIR).
+
+AC remotes are *stateful*: every press transmits the full state (power, mode, target temperature, fan speed, swing) in one IR frame, so the climate entity re-sends the complete state on each change. State is assumed/optimistic — there is no feedback from the unit.
+
+- HVAC modes: `off`, `cool`, `dry`, `fan_only`, `auto` (heat is omitted — the PD-8779 is cooling-only)
+- Target temperature: 16–32 °C, 1° steps
+- Fan: `auto`, `low`, `medium`, `high`
+- Swing: `off`, `vertical`
+
+> **⚠️ Untested on real hardware.** The ZH/LT-01 encoder is ported from the ESPHome and HeatpumpIR reference implementations but has not yet been verified against an actual Tristar PD-8779. If a field is off (e.g. the unit ignores temperature or mode), please open an issue with a Broadlink-learned capture of the relevant button so the encoding can be corrected.
+
 ## Testing
 
 1. **Raw test first** (IR): Set up with "Raw Test Signal". Press the button. If your IR blaster blinks, the chain works.
@@ -89,7 +104,7 @@ This means voice assistants ("Alexa, set ceiling fan to medium"), Lovelace fan/l
 
 ## Adding more device types
 
-Built-in protocol encoders: **NEC**, **Sharp**, and **Denon** for IR. RF (Airwit) uses raw Broadlink-learned packets. For unsupported protocols, learned codes can be stored as raw timings — see [`rf_commands.py`](custom_components/remote_devices/rf_commands.py) and [`nec.py`](custom_components/remote_devices/nec.py) for the pattern. PRs welcome!
+Built-in protocol encoders: **NEC** (incl. extended NEC), **Sharp**, **Denon**, and **ZH/LT-01** (air conditioners) for IR. RF (Airwit) uses raw Broadlink-learned packets. For unsupported protocols, learned codes can be stored as raw timings — see [`rf_commands.py`](custom_components/remote_devices/rf_commands.py) and [`nec.py`](custom_components/remote_devices/nec.py) for the pattern. PRs welcome!
 
 ## Upgrading from 0.7.x (`infrared_remote`)
 

@@ -12,6 +12,7 @@ DEVICE_TYPE_SAMSUNG_TV = "samsung_tv"
 DEVICE_TYPE_SHARP_TV = "sharp_tv"
 DEVICE_TYPE_DENON_AVR = "denon_avr"
 DEVICE_TYPE_AUDIOENGINE_A5 = "audioengine_a5"
+DEVICE_TYPE_TRISTAR_AC = "tristar_ac"
 DEVICE_TYPE_PHILIPS_LAMP = "philips_lamp"
 DEVICE_TYPE_AMINO_STB = "amino_stb"
 DEVICE_TYPE_RAW_TEST = "raw_test"
@@ -23,6 +24,7 @@ DEVICE_TYPES = {
     DEVICE_TYPE_SHARP_TV: "Sharp TV (Aquos)",
     DEVICE_TYPE_DENON_AVR: "Denon AVR Receiver",
     DEVICE_TYPE_AUDIOENGINE_A5: "Audioengine A5+ Speakers",
+    DEVICE_TYPE_TRISTAR_AC: "Tristar PD-8779 Air Conditioner (ZH/LT-01)",
     DEVICE_TYPE_PHILIPS_LAMP: "Philips RGBIC Lamp",
     DEVICE_TYPE_AMINO_STB: "Amino Kamai Set-top Box",
     DEVICE_TYPE_AIRWIT_FAN: "Airwit Plafondventilator (RF 433 MHz)",
@@ -38,6 +40,7 @@ DEVICE_PROTOCOLS = {
     DEVICE_TYPE_SHARP_TV: "ir",
     DEVICE_TYPE_DENON_AVR: "ir",
     DEVICE_TYPE_AUDIOENGINE_A5: "ir",
+    DEVICE_TYPE_TRISTAR_AC: "ir",
     DEVICE_TYPE_PHILIPS_LAMP: "ir",
     DEVICE_TYPE_AMINO_STB: "ir",
     DEVICE_TYPE_RAW_TEST: "ir",
@@ -181,6 +184,42 @@ AUDIOENGINE_A5_COMMANDS = {
     "volume_down": 0x07,
     "mute": 0x03,
 }
+
+# Tristar PD-8779 portable air conditioner — ZH/LT-01 protocol.
+# Stateful AC protocol: every press sends the full state in a 12-byte frame,
+# LSB first, where each even byte is the bitwise complement of the next odd
+# byte (the receiver's integrity check). Ported from the ESPHome `zhlt01`
+# component and ToniA's HeatpumpIR ZHLT01. Carrier 38 kHz.
+ZHLT01_FREQUENCY_KHZ = 38
+ZHLT01_HDR_MARK_US = 6100
+ZHLT01_HDR_SPACE_US = 7400
+ZHLT01_BIT_MARK_US = 500
+ZHLT01_ONE_SPACE_US = 1800
+ZHLT01_ZERO_SPACE_US = 600
+
+ZHLT01_REMOTE_ID = 0xD5  # byte 11
+
+ZHLT01_TEMP_MIN = 16
+ZHLT01_TEMP_MAX = 32
+
+# Byte 7 fields: power | fan | vertical swing | horizontal swing
+ZHLT01_POWER_OFF = 0x00
+ZHLT01_POWER_ON = 0x02
+ZHLT01_FAN_AUTO = 0x00
+ZHLT01_FAN_SILENT = 0x01
+ZHLT01_FAN_LOW = 0x60  # FAN1
+ZHLT01_FAN_MEDIUM = 0x40  # FAN2
+ZHLT01_FAN_HIGH = 0x20  # FAN3
+ZHLT01_VDIR_SWING = 0x04
+ZHLT01_VDIR_FIXED = 0x08
+ZHLT01_HDIR_FIXED = 0x10
+
+# Byte 9 fields: mode | (temperature - 16)
+ZHLT01_MODE_AUTO = 0x00
+ZHLT01_MODE_COOL = 0x20
+ZHLT01_MODE_DRY = 0x40
+ZHLT01_MODE_FAN = 0x60
+ZHLT01_MODE_HEAT = 0x80
 
 # Philips RGBIC Ambient Floor Lamp — NEC protocol (address 0x00)
 PHILIPS_LAMP_ADDRESS = 0x00

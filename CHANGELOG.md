@@ -5,6 +5,22 @@ All notable changes to the Remote Devices integration will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-06-21
+
+### Added
+- **Tristar PD-8779 Air Conditioner** device type (IR — ZH/LT-01 protocol) exposed as a new **`climate`** platform/entity
+  - HVAC modes: off, cool, dry, fan_only, auto (heat omitted — cooling-only unit)
+  - Target temperature 16–32 °C (1° steps), fan auto/low/medium/high, vertical swing on/off
+  - Stateful protocol: every change re-sends the full 12-byte ZH/LT-01 frame (power, mode, temp, fan, swing); state is assumed/optimistic
+- New `zhlt01.py` encoder (`ZHLT01Command`) and `climate.py` platform; `Platform.CLIMATE` added to the integration's platforms
+- New ZH/LT-01 constants in `const.py` (timings, mode/fan/swing/power values, temp range)
+
+### Changed
+- Bumped DeviceInfo `sw_version` to 0.10.0 across all platforms (also corrects `fan`/`light`, which still read 0.8.1)
+
+### Notes
+- **The ZH/LT-01 encoder is untested on real hardware.** It is ported faithfully from the ESPHome `zhlt01` component and ToniA's HeatpumpIR ZHLT01, but has not been verified against an actual Tristar PD-8779. If a field is wrong, open an issue with a Broadlink-learned capture so the encoding can be corrected.
+
 ## [0.9.0] - 2026-06-15
 
 ### Added

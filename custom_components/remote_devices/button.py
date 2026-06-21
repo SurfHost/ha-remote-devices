@@ -147,7 +147,7 @@ async def async_setup_entry(
             name=device_name,
             manufacturer="Remote Devices",
             model=DEVICE_TYPES.get(device_type, device_type),
-            sw_version="0.9.0",
+            sw_version="0.10.0",
         )
 
     protocol = DEVICE_PROTOCOLS.get(device_type, "ir")

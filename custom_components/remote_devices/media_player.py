@@ -30,6 +30,7 @@ from .const import (
     DEVICE_TYPE_RAW_TEST,
     DEVICE_TYPE_SAMSUNG_TV,
     DEVICE_TYPE_SHARP_TV,
+    DEVICE_TYPE_TRISTAR_AC,
     DEVICE_TYPES,
     DOMAIN,
 )
@@ -64,6 +65,7 @@ async def async_setup_entry(
         DEVICE_TYPE_PHILIPS_LAMP,
         DEVICE_TYPE_AMINO_STB,
         DEVICE_TYPE_AIRWIT_FAN,
+        DEVICE_TYPE_TRISTAR_AC,
     ):
         return
 
@@ -85,7 +87,7 @@ async def async_setup_entry(
         name=device_name,
         manufacturer="Remote Devices",
         model=DEVICE_TYPES.get(device_type, device_type),
-        sw_version="0.9.0",
+        sw_version="0.10.0",
     )
 
     # Power command names and entity presentation vary by device type. Denon has
