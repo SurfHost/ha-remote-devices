@@ -5,6 +5,15 @@ All notable changes to the Remote Devices integration will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-06-22
+
+### Added
+- **Tristar PD-8779 temperature as a `number` entity** — a `−`/`+` stepper (16–31 °C) instead of separate Temp Up / Temp Down buttons. Changing it sends the matching number of `temp_up`/`temp_down` IR presses and tracks an assumed value (no feedback from the AC, so it can drift if the physical remote is also used).
+- New `number` platform (`Platform.NUMBER`).
+
+### Changed
+- The Tristar AC now exposes **3 buttons** (power, mode, speed) plus the temperature number, rather than 5 buttons.
+
 ## [0.11.0] - 2026-06-22
 
 ### Changed

@@ -44,7 +44,7 @@ from .const import (
     PHILIPS_LAMP_COMMANDS,
     SAMSUNG_TV_COMMANDS,
     SHARP_TV_COMMANDS,
-    TRISTAR_AC_COMMANDS,
+    TRISTAR_AC_BUTTONS,
 )
 from .ir_commands import (
     make_amino_stb_command,
@@ -154,7 +154,7 @@ async def async_setup_entry(
             name=device_name,
             manufacturer="Remote Devices",
             model=DEVICE_TYPES.get(device_type, device_type),
-            sw_version="0.11.0",
+            sw_version="0.12.0",
         )
 
     protocol = DEVICE_PROTOCOLS.get(device_type, "ir")
@@ -207,7 +207,9 @@ async def async_setup_entry(
                 )
             )
     elif device_type == DEVICE_TYPE_TRISTAR_AC:
-        for cmd_name in TRISTAR_AC_COMMANDS:
+        # Temperature is a separate number entity (+/- stepper); only the
+        # discrete buttons are exposed here.
+        for cmd_name in TRISTAR_AC_BUTTONS:
             entities.append(
                 button_cls(
                     config_entry=config_entry,

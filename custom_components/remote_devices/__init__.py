@@ -1,8 +1,8 @@
 """The Remote Devices integration.
 
 A consumer integration for the Home Assistant 2026.4 `infrared` and 2026.5
-`radio_frequency` entity platforms. Creates button, media_player, fan, and
-light entities that send IR or RF commands via any available emitter
+`radio_frequency` entity platforms. Creates button, media_player, fan, light,
+and number entities that send IR or RF commands via any available emitter
 (e.g., Broadlink, ESPHome).
 
 Built-in support: NEC, Sharp, and Denon protocol encoders for IR; raw
@@ -27,6 +27,7 @@ PLATFORMS = [
     Platform.FAN,
     Platform.LIGHT,
     Platform.MEDIA_PLAYER,
+    Platform.NUMBER,
 ]
 
 

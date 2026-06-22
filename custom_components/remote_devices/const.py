@@ -199,6 +199,16 @@ TRISTAR_AC_COMMANDS = {
     "speed": 0x06,
 }
 
+# Buttons exposed for the AC (temperature is a separate number entity that
+# drives temp_up/temp_down via a +/- stepper).
+TRISTAR_AC_BUTTONS = ("power", "mode", "speed")
+
+# Assumed-state temperature range for the number entity. The AC gives no
+# feedback, so this just bounds how far the +/- stepper can travel.
+TRISTAR_AC_TEMP_MIN = 16
+TRISTAR_AC_TEMP_MAX = 31
+TRISTAR_AC_TEMP_DEFAULT = 22
+
 # Philips RGBIC Ambient Floor Lamp — NEC protocol (address 0x00)
 PHILIPS_LAMP_ADDRESS = 0x00
 
