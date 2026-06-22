@@ -83,7 +83,7 @@ async def async_setup_entry(
             name=device_name,
             manufacturer="Airwit",
             model="Plafondventilator",
-            sw_version="0.12.1",
+            sw_version="0.13.0",
         )
 
     async_add_entities(

@@ -5,6 +5,17 @@ All notable changes to the Remote Devices integration will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-06-22
+
+### Changed
+- **Reverted the Tristar temperature to Temp Up / Temp Down buttons.** The 0.12.x `number` stepper only shows `−`/`+` controls in a custom Tile card (with the `numeric-input` feature); in the default device/entities card it renders as a plain value box. Two always-visible "Klik" buttons are the simpler default, so the AC is back to **5 buttons** (power, temp_up, temp_down, mode, speed).
+
+### Removed
+- The `number` platform and the assumed-state temperature entity (and `Platform.NUMBER`). A number entity and temp buttons can't coexist cleanly — they'd track temperature independently and drift apart.
+
+### Upgrade note
+- Reload the integration or restart HA after updating; the temperature number is replaced by the Temp Up / Temp Down buttons.
+
 ## [0.12.1] - 2026-06-22
 
 ### Fixed

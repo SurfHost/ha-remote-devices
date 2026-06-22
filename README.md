@@ -27,7 +27,7 @@ Set it up, pick your device type, pick the matching emitter (the integration fil
 | Sharp TV (Aquos) | IR — Sharp (addr 0x01) | media_player + 20 buttons |
 | Denon AVR Receiver | IR — Denon (addr 0x02) | media_player + 16 buttons |
 | Audioengine A5+ Speakers | IR — extended NEC (addr 0x00FD) | media_player (volume + mute) + 3 buttons |
-| Tristar PD-8779 Air Conditioner | IR — NEC (addr 0x04) | 3 buttons (power, mode, speed) + temperature number |
+| Tristar PD-8779 Air Conditioner | IR — NEC (addr 0x04) | 5 buttons (power, temp ±, mode, speed) |
 | Philips RGBIC Lamp | IR — NEC (addr 0x00) | 11 buttons |
 | Amino Kamai 7X STB | IR — RC6 (raw learned) | 8 buttons |
 | Raw Test | IR — raw burst | 1 button |
@@ -84,12 +84,13 @@ This means voice assistants ("Alexa, set ceiling fan to medium"), Lovelace fan/l
 
 ## Tristar PD-8779 Air Conditioner
 
-Despite being an air conditioner, the PD-8779 remote is a plain **NEC** remote (address `0x04`) that sends discrete button codes — the AC keeps its own temperature/mode state on its front display. It is therefore exposed as entities that mirror the physical remote, not a climate entity:
+Despite being an air conditioner, the PD-8779 remote is a plain **NEC** remote (address `0x04`) that sends discrete button codes — the AC keeps its own temperature/mode state on its front display. It is therefore exposed as **button** entities that mirror the physical remote, not a climate entity:
 
-- **Buttons:** `power`, `mode` (cycles cool/dry/fan), `speed` (cycles fan speed)
-- **Number:** `temperature` — a `−`/`+` stepper (16–31 °C). Because the AC sends only relative `temp_up`/`temp_down` codes, the number tracks an **assumed** value and sends that many up/down presses when you change it. It can drift if you also use the physical remote.
+- `power`, `temp_up`, `temp_down`, `mode` (cycles cool/dry/fan), `speed` (cycles fan speed)
 
 The codes were decoded from real Broadlink-learned packets (all with valid NEC checksums). If your remote has extra buttons (timer, swing, sleep, …), learn them and open an issue — they're almost certainly more NEC codes on address `0x04` and easy to add.
+
+> Tip: if you'd prefer a single `−`/`+` temperature stepper instead of two buttons, add a **Tile card** for a [helper](https://www.home-assistant.io/integrations/input_number/) or use the `temp_up`/`temp_down` buttons in a custom card — the AC sends only relative steps, so there's no absolute "set 23 °C" code.
 
 ## Testing
 
