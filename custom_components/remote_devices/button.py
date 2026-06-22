@@ -37,12 +37,14 @@ from .const import (
     DEVICE_TYPE_RAW_TEST,
     DEVICE_TYPE_SAMSUNG_TV,
     DEVICE_TYPE_SHARP_TV,
+    DEVICE_TYPE_TRISTAR_AC,
     DEVICE_TYPES,
     DOMAIN,
     LG_TV_COMMANDS,
     PHILIPS_LAMP_COMMANDS,
     SAMSUNG_TV_COMMANDS,
     SHARP_TV_COMMANDS,
+    TRISTAR_AC_COMMANDS,
 )
 from .ir_commands import (
     make_amino_stb_command,
@@ -53,6 +55,7 @@ from .ir_commands import (
     make_raw_test_command,
     make_samsung_command,
     make_sharp_tv_command,
+    make_tristar_ac_command,
 )
 from .rf_commands import make_airwit_fan_command
 
@@ -117,6 +120,10 @@ BUTTON_ICONS = {
     "forward": "mdi:fast-forward",
     "rewind": "mdi:rewind",
     "all_off": "mdi:power-off",
+    "temp_up": "mdi:thermometer-plus",
+    "temp_down": "mdi:thermometer-minus",
+    "speed": "mdi:fan",
+    "mode": "mdi:thermostat",
 }
 
 
@@ -147,7 +154,7 @@ async def async_setup_entry(
             name=device_name,
             manufacturer="Remote Devices",
             model=DEVICE_TYPES.get(device_type, device_type),
-            sw_version="0.10.0",
+            sw_version="0.11.0",
         )
 
     protocol = DEVICE_PROTOCOLS.get(device_type, "ir")
@@ -196,6 +203,19 @@ async def async_setup_entry(
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
                     command_factory=lambda name=cmd_name: make_denon_avr_command(name),
+                    device_info=device_info,
+                )
+            )
+    elif device_type == DEVICE_TYPE_TRISTAR_AC:
+        for cmd_name in TRISTAR_AC_COMMANDS:
+            entities.append(
+                button_cls(
+                    config_entry=config_entry,
+                    emitter_entity_id=emitter_entity_id,
+                    command_name=cmd_name,
+                    command_factory=lambda name=cmd_name: make_tristar_ac_command(
+                        name
+                    ),
                     device_info=device_info,
                 )
             )

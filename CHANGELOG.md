@@ -5,6 +5,17 @@ All notable changes to the Remote Devices integration will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-06-22
+
+### Changed
+- **Tristar PD-8779 reimplemented correctly.** Real Broadlink captures of the remote revealed it is a plain **NEC** remote (address `0x04`) sending discrete button codes — not the stateful ZH/LT-01 AC protocol assumed in 0.10.0. It is now exposed as **5 button entities** (power `0x04`, temp_up `0x05`, temp_down `0x01`, mode `0x0D`, speed `0x06`), decoded from packets with valid NEC checksums.
+
+### Removed
+- The `climate` platform, the `zhlt01.py` encoder, and all ZH/LT-01 constants — they were based on a wrong assumption about this unit and never worked. `Platform.CLIMATE` is no longer registered.
+
+### Upgrade note
+- If you added the Tristar device on 0.10.0, reload the integration (or restart HA) after updating: the old (non-functional) climate entity is replaced by the button entities.
+
 ## [0.10.0] - 2026-06-21
 
 ### Added

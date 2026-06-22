@@ -87,7 +87,7 @@ async def async_setup_entry(
         name=device_name,
         manufacturer="Remote Devices",
         model=DEVICE_TYPES.get(device_type, device_type),
-        sw_version="0.10.0",
+        sw_version="0.11.0",
     )
 
     # Power command names and entity presentation vary by device type. Denon has

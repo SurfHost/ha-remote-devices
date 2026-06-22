@@ -39,6 +39,8 @@ from .const import (  # noqa: E402
     SAMSUNG_TV_COMMANDS,
     SHARP_TV_ADDRESS,
     SHARP_TV_COMMANDS,
+    TRISTAR_AC_ADDRESS,
+    TRISTAR_AC_COMMANDS,
 )
 
 
@@ -124,6 +126,18 @@ def make_audioengine_a5_command(command_name: str) -> NECCommand | None:
         command=code,
         address_high=AUDIOENGINE_A5_ADDRESS_HIGH,
     )
+
+
+def make_tristar_ac_command(command_name: str) -> NECCommand | None:
+    """Create an IR command for a Tristar PD-8779 air conditioner.
+
+    Plain NEC protocol (address 0x04). The remote sends discrete button codes
+    (power, temp up/down, mode, fan speed); the AC tracks its own state.
+    """
+    code = TRISTAR_AC_COMMANDS.get(command_name)
+    if code is None:
+        return None
+    return NECCommand(address=TRISTAR_AC_ADDRESS, command=code)
 
 
 def make_philips_lamp_command(command_name: str) -> NECCommand | None:
