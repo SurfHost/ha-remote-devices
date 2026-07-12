@@ -287,22 +287,31 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Reconfigure: change emitter, device type, and (for new) name."""
+        """Reconfigure: change emitter, device type, and name.
+
+        Both standalone and attach entries render the same field order:
+        Emitter → Target Device (attach only) → Device Type → Device Name.
+        Device Name is editable in both modes; if left blank it falls back to
+        the target device's name (attach) or the device type label (standalone).
+        """
         entry = self._get_reconfigure_entry()
         is_attach = bool(entry.data.get(CONF_ATTACH_TO_DEVICE))
 
         if user_input is not None:
             entity_id = user_input[CONF_EMITTER_ENTITY_ID]
             device_type = user_input[CONF_DEVICE_TYPE]
+            device_name = user_input.get(CONF_DEVICE_NAME, "").strip()
 
             if is_attach:
                 device_id = user_input[CONF_ATTACH_TO_DEVICE]
-                dev_reg = dr.async_get(self.hass)
-                dev_entry = dev_reg.async_get(device_id)
-                device_name = dev_entry.name if dev_entry else device_id
+                if not device_name:
+                    dev_reg = dr.async_get(self.hass)
+                    dev_entry = dev_reg.async_get(device_id)
+                    device_name = dev_entry.name if dev_entry else device_id
 
                 return self.async_update_reload_and_abort(
                     entry,
+                    title=f"{device_name} Buttons",
                     data={
                         CONF_EMITTER_ENTITY_ID: entity_id,
                         CONF_DEVICE_TYPE: device_type,
@@ -312,7 +321,6 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
                     reason="reconfigure_successful",
                 )
 
-            device_name = user_input.get(CONF_DEVICE_NAME, "").strip()
             if not device_name:
                 device_name = DEVICE_TYPES.get(device_type, "Remote Device")
 
@@ -346,38 +354,29 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
             )
         )
 
+        device_type_selector = SelectSelector(
+            SelectSelectorConfig(
+                options=device_options,
+                mode=SelectSelectorMode.DROPDOWN,
+            )
+        )
+        device_name_selector = TextSelector(TextSelectorConfig(type="text"))
+
+        # Same field order for both modes; attach entries additionally show the
+        # Target Device field (inherent to attach mode) after the emitter.
+        fields: dict[Any, Any] = {
+            vol.Required(CONF_EMITTER_ENTITY_ID): emitter_selector,
+        }
         if is_attach:
-            schema = vol.Schema(
-                {
-                    vol.Required(CONF_ATTACH_TO_DEVICE): DeviceSelector(
-                        DeviceSelectorConfig(
-                            entity=[{"domain": "media_player"}],
-                        )
-                    ),
-                    vol.Required(CONF_EMITTER_ENTITY_ID): emitter_selector,
-                    vol.Required(CONF_DEVICE_TYPE): SelectSelector(
-                        SelectSelectorConfig(
-                            options=device_options,
-                            mode=SelectSelectorMode.DROPDOWN,
-                        )
-                    ),
-                }
+            fields[vol.Required(CONF_ATTACH_TO_DEVICE)] = DeviceSelector(
+                DeviceSelectorConfig(
+                    entity=[{"domain": "media_player"}],
+                )
             )
-        else:
-            schema = vol.Schema(
-                {
-                    vol.Required(CONF_EMITTER_ENTITY_ID): emitter_selector,
-                    vol.Required(CONF_DEVICE_TYPE): SelectSelector(
-                        SelectSelectorConfig(
-                            options=device_options,
-                            mode=SelectSelectorMode.DROPDOWN,
-                        )
-                    ),
-                    vol.Optional(CONF_DEVICE_NAME, default=""): TextSelector(
-                        TextSelectorConfig(type="text")
-                    ),
-                }
-            )
+        fields[vol.Required(CONF_DEVICE_TYPE)] = device_type_selector
+        fields[vol.Optional(CONF_DEVICE_NAME, default="")] = device_name_selector
+
+        schema = vol.Schema(fields)
 
         return self.async_show_form(
             step_id="reconfigure",

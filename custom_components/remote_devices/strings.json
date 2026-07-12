@@ -42,10 +42,16 @@
         "title": "Reconfigure Remote Devices",
         "description": "Currently linked to emitter: **{emitter}**",
         "data": {
-          "attach_to_device": "Target Device",
           "emitter_entity_id": "Emitter",
+          "attach_to_device": "Target Device",
           "device_type": "Device Type",
           "device_name": "Device Name"
+        },
+        "data_description": {
+          "emitter_entity_id": "The IR or RF emitter used to send commands.",
+          "attach_to_device": "The existing device these button entities are attached to.",
+          "device_type": "The kind of device to control. Pick an emitter that matches its protocol (IR or RF).",
+          "device_name": "Display name for this device. Leave blank to use the default."
         }
       }
     },

@@ -5,6 +5,19 @@ All notable changes to the Remote Devices integration will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-07-12
+
+### Changed
+- **Unified the Reconfigure dialog** so entries that create their own device and entries attached to an existing device now show the same fields in the same order: **Emitter → Target Device (attached entries only) → Device Type → Device Name**. Previously attached entries put Target Device first and hid the name, while standalone entries led with the emitter — the two looked inconsistent.
+
+### Added
+- **Editable Device Name in the Reconfigure dialog for attached entries.** The name defaults to the current value and, if left blank, falls back to the target device's name (attached) or the device-type label (standalone). Attached entries now also update their title on reconfigure, matching standalone entries.
+- **Dutch translation** (`nl.json`) for the full setup and reconfigure flow.
+- Hint text under each field in the Reconfigure dialog.
+
+### Upgrade note
+- No action required. Existing entries keep working unchanged; reopen **Reconfigure** to see the unified layout.
+
 ## [0.13.0] - 2026-06-22
 
 ### Changed

@@ -1,0 +1,66 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Remote Devices instellen",
+        "description": "Kies hoe je jouw IR- of RF-afstandsbediening wilt instellen.",
+        "data": {
+          "setup_mode": "Instelmodus"
+        }
+      },
+      "new_device": {
+        "title": "Kies apparaattype",
+        "description": "Kies wat voor apparaat je wilt bedienen. Geef het eventueel een naam.",
+        "data": {
+          "device_type": "Apparaattype",
+          "device_name": "Apparaatnaam (optioneel, bijv. 'Woonkamer TV')"
+        }
+      },
+      "select_emitter": {
+        "title": "Selecteer {protocol}-zender",
+        "description": "{device_type} gebruikt het {protocol}-protocol. Kies welke {protocol}-zender je wilt gebruiken.",
+        "data": {
+          "emitter_entity_id": "Zender"
+        }
+      },
+      "attach": {
+        "title": "Koppelen aan bestaand apparaat",
+        "description": "Voeg knop-entiteiten toe aan een bestaand apparaat. Er wordt geen mediaspeler aangemaakt.",
+        "data": {
+          "attach_to_device": "Doelapparaat",
+          "device_type": "Apparaattype"
+        }
+      },
+      "attach_select_emitter": {
+        "title": "Selecteer {protocol}-zender",
+        "description": "{device_type} gebruikt het {protocol}-protocol. Kies welke {protocol}-zender je wilt gebruiken.",
+        "data": {
+          "emitter_entity_id": "Zender"
+        }
+      },
+      "reconfigure": {
+        "title": "Remote Devices opnieuw configureren",
+        "description": "Momenteel gekoppeld aan zender: **{emitter}**",
+        "data": {
+          "emitter_entity_id": "Zender",
+          "attach_to_device": "Doelapparaat",
+          "device_type": "Apparaattype",
+          "device_name": "Apparaatnaam"
+        },
+        "data_description": {
+          "emitter_entity_id": "De IR- of RF-zender die de commando's verstuurt.",
+          "attach_to_device": "Het bestaande apparaat waaraan deze knop-entiteiten zijn gekoppeld.",
+          "device_type": "Het soort apparaat dat je wilt bedienen. Kies een zender die bij het protocol past (IR of RF).",
+          "device_name": "Weergavenaam voor dit apparaat. Laat leeg om de standaardnaam te gebruiken."
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Deze configuratie bestaat al.",
+      "no_emitters": "Geen infrarood- of radio_frequency-zenderentiteiten gevonden. Stel eerst een zenderintegratie in (bijv. Broadlink IR/RF-zender).",
+      "no_ir_emitters": "Geen infraroodzenderentiteiten gevonden. Stel eerst een IR-zenderintegratie in.",
+      "no_rf_emitters": "Geen radio_frequency-zenderentiteiten gevonden. Stel eerst een RF-zenderintegratie in (bijv. Broadlink IR/RF-zender op een RM4 Pro).",
+      "reconfigure_successful": "Configuratie succesvol bijgewerkt."
+    }
+  }
+}
