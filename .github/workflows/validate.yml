@@ -34,7 +34,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
-        with:
       # uv sync honours [tool.uv] package = false, so it installs the
       # dependencies without trying to build this custom component as a wheel.
       # It also fetches the Python that requires-python demands (>= 3.14.2,
