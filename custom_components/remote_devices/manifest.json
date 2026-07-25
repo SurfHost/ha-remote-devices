@@ -8,5 +8,5 @@
   "integration_type": "device",
   "iot_class": "assumed_state",
   "issue_tracker": "https://github.com/SurfHost/ha-remote-devices/issues",
-  "version": "0.14.0"
+  "version": "0.14.1"
 }

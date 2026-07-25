@@ -1,6 +1,6 @@
 [project]
 name = "ha-remote-devices"
-version = "0.14.0"
+version = "0.14.1"
 description = "IR/RF remote device entities for Home Assistant on top of the infrared and radio_frequency platforms"
 # 3.14.2 is forced, not chosen: the homeassistant floor below (2026.5.0, matching
 # hacs.json) itself declares Requires-Python >= 3.14.2, so anything lower makes

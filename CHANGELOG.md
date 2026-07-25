@@ -5,6 +5,17 @@ All notable changes to the Remote Devices integration will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.1] - 2026-07-25
+
+### Fixed
+- **`iot_class` corrected from `local_push` to `assumed_state`.** This integration only transmits IR and RF and never receives state back, so `local_push` was wrong. `assumed_state` is the value HA defines for a device whose state cannot be confirmed.
+- **`sw_version` is no longer hardcoded in four places.** It was a literal that had to be hand-edited on every release. A single helper now reads it from `manifest.json`, so it cannot go stale.
+
+### Added
+- MIT `LICENSE`, which the repository had never shipped.
+- CI now runs `ruff check`, `ruff format --check` and strict `mypy` against the integration. Previously the workflow validated HACS and hassfest metadata only, so no line of Python was ever executed by CI.
+- A release gate that fails a tag push when the tag disagrees with the version in `manifest.json`.
+
 ## [0.14.0] - 2026-07-12
 
 ### Changed
