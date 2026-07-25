@@ -25,7 +25,7 @@ def decode_broadlink_b64_to_timings(
     Returns a flat list `[+pulse_us, -space_us, +pulse_us, -space_us, ...]`.
 
     By default (strip_repeats=True), stops at the first inter-frame gap
-    longer than 50 ms — appropriate for IR codes where the captured packet
+    longer than 50 ms > appropriate for IR codes where the captured packet
     contains repeat frames separated by long gaps.
 
     For RF codes, pass strip_repeats=False: RF signals routinely contain long
@@ -53,7 +53,7 @@ def decode_broadlink_b64_to_timings(
         mark = raw_us[idx]
         space = raw_us[idx + 1]
         if strip_repeats and space > 50000:
-            # End of first frame — emit a final mark/space using mark length
+            # End of first frame > emit a final mark/space using mark length
             # for both sides (matches the previous sentinel behaviour) and
             # stop, dropping subsequent repeat frames.
             timings.append(mark)

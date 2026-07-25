@@ -37,7 +37,7 @@ from .const import (
 
 
 class NECCommand(InfraredCommand):
-    """NEC protocol IR command — emits the standard 32-bit NEC frame."""
+    """NEC protocol IR command > emits the standard 32-bit NEC frame."""
 
     def __init__(
         self,

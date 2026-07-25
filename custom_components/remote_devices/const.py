@@ -120,7 +120,7 @@ DENON_ONE_SPACE_US = 1848  # 7 units (264 * 7)
 DENON_ZERO_SPACE_US = 792  # 3 units (264 * 3)
 DENON_FRAME_GAP_US = 43560  # 165 units (264 * 165)
 
-# Sharp TV codes (address 1) — Sharp Aquos LC series
+# Sharp TV codes (address 1) > Sharp Aquos LC series
 SHARP_TV_ADDRESS = 0x01
 
 SHARP_TV_COMMANDS = {
@@ -146,7 +146,7 @@ SHARP_TV_COMMANDS = {
     "9": 9,
 }
 
-# Denon AVR codes (address 2) — Denon AV receivers
+# Denon AVR codes (address 2) > Denon AV receivers
 DENON_AVR_ADDRESS = 0x02
 
 # Verified codes from actual Broadlink-learned AVR-2106 remote + IRDB.
@@ -169,7 +169,7 @@ DENON_AVR_COMMANDS = {
     "multi_channel": 219,
 }
 
-# Audioengine A5+ powered speakers — extended NEC protocol.
+# Audioengine A5+ powered speakers > extended NEC protocol.
 # 16-bit address 0x00FD (low byte 0x00, high byte 0xFD). Unlike standard NEC,
 # the high byte is NOT the complement of the low byte, so it is specified
 # explicitly via NECCommand(address_high=...).
@@ -185,7 +185,7 @@ AUDIOENGINE_A5_COMMANDS = {
     "mute": 0x03,
 }
 
-# Tristar PD-8779 portable air conditioner — plain NEC protocol (address 0x04).
+# Tristar PD-8779 portable air conditioner > plain NEC protocol (address 0x04).
 # The remote sends discrete button codes (the AC keeps its own temp/mode state
 # on its display); it is NOT a stateful AC frame. Codes decoded from real
 # Broadlink-learned packets (all with valid NEC checksums).
@@ -199,7 +199,7 @@ TRISTAR_AC_COMMANDS = {
     "speed": 0x06,
 }
 
-# Philips RGBIC Ambient Floor Lamp — NEC protocol (address 0x00)
+# Philips RGBIC Ambient Floor Lamp > NEC protocol (address 0x00)
 PHILIPS_LAMP_ADDRESS = 0x00
 
 PHILIPS_LAMP_COMMANDS = {
@@ -216,7 +216,7 @@ PHILIPS_LAMP_COMMANDS = {
     "yellow": 0x0C,
 }
 
-# Amino Kamai 7X Set-top Box — RC6 protocol (raw Broadlink-learned codes).
+# Amino Kamai 7X Set-top Box > RC6 protocol (raw Broadlink-learned codes).
 # RC6 is too complex to encode from scratch, so we store the base64
 # Broadlink packets and decode them to raw timings at runtime.
 AMINO_STB_BROADLINK_CODES = {
@@ -230,7 +230,7 @@ AMINO_STB_BROADLINK_CODES = {
     "stop": "JgCAAFQeDg4ODw0eDhwqHg0PDg4ODw4ODg8NDx0cDg8ODw4OHA4ODw4dDg4dHA4PHA8OHA4PDg8bDw4dDg8NDxsACLxVHQ4ODg8OHQ4cKh4NDw4PDQ8ODw0PDg4dHA4QDBAODhwPDQ8OHQ4PHBwODxwPDhwOEAwQGw8OHQ4PDQ8cAA0F",
 }
 
-# Airwit Plafondventilator (ceiling fan with light) — RF 433 MHz, OOK modulation.
+# Airwit Plafondventilator (ceiling fan with light) > RF 433 MHz, OOK modulation.
 # Codes captured from the original Broadlink learn flow; same wire format as IR
 # but the type byte is 0xb2 (RF 433) instead of 0x26 (IR).
 AIRWIT_FAN_FREQUENCY_HZ = 433_920_000

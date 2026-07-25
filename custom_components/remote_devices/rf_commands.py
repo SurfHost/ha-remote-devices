@@ -35,7 +35,7 @@ class RawBroadlinkRFCommand(RadioFrequencyCommand):
             modulation=ModulationType.OOK,
             repeat_count=repeat_count,
         )
-        # RF signals contain long internal gaps (sync→data) that are NOT
+        # RF signals contain long internal gaps (sync > data) that are NOT
         # repeat-frame boundaries. Decode the full packet without stripping.
         self._timings = decode_broadlink_b64_to_timings(b64_code, strip_repeats=False)
 

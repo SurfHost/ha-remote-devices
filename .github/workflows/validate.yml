@@ -34,6 +34,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+        with:
+          # No uv.lock is committed, so nothing can match the cache key. On the
+          # default (auto) setup-uv turns the cache on and then warns on every run
+          # that it can never be invalidated.
+          enable-cache: false
       # uv sync honours [tool.uv] package = false, so it installs the
       # dependencies without trying to build this custom component as a wheel.
       # It also fetches the Python that requires-python demands (>= 3.14.2,
