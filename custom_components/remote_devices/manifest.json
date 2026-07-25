@@ -6,7 +6,7 @@
   "dependencies": ["infrared", "radio_frequency"],
   "documentation": "https://github.com/SurfHost/ha-remote-devices",
   "integration_type": "device",
-  "iot_class": "local_push",
+  "iot_class": "assumed_state",
   "issue_tracker": "https://github.com/SurfHost/ha-remote-devices/issues",
   "version": "0.14.0"
 }

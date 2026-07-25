@@ -13,17 +13,13 @@ _LOGGER = logging.getLogger(__name__)
 # Try to import the official infrared-protocols library
 _HAS_IR_PROTOCOLS = False
 try:
-    from infrared_protocols.codes.lg.tv import LGTVCode, make_lg_tv_command  # noqa: F401
+    from infrared_protocols.codes.lg.tv import LGTVCode, make_lg_tv_command
 
     _HAS_IR_PROTOCOLS = True
     _LOGGER.info("Using official infrared-protocols library for IR commands")
 except ImportError:
-    _LOGGER.info(
-        "infrared-protocols library not available, using built-in NEC encoder"
-    )
+    _LOGGER.info("infrared-protocols library not available, using built-in NEC encoder")
 
-from .nec import NECCommand, RawBroadlinkCommand, RawTestCommand  # noqa: E402
-from .sharp import DenonCommand, SharpCommand  # noqa: E402
 from .const import (  # noqa: E402
     AMINO_STB_BROADLINK_CODES,
     AUDIOENGINE_A5_ADDRESS,
@@ -42,6 +38,8 @@ from .const import (  # noqa: E402
     TRISTAR_AC_ADDRESS,
     TRISTAR_AC_COMMANDS,
 )
+from .nec import NECCommand, RawBroadlinkCommand, RawTestCommand  # noqa: E402
+from .sharp import DenonCommand, SharpCommand  # noqa: E402
 
 
 def has_infrared_protocols() -> bool:
@@ -67,7 +65,10 @@ def make_lg_command(command_name: str) -> object | None:
         }
         lg_code = code_map.get(command_name)
         if lg_code is not None:
-            return make_lg_tv_command(lg_code)
+            # infrared_protocols ships no py.typed, so this call is Any to
+            # mypy. Bind it to a typed local rather than returning Any.
+            official_command: object = make_lg_tv_command(lg_code)
+            return official_command
         # Fall through to NEC for commands not in the official library
 
     code = LG_TV_COMMANDS.get(command_name)

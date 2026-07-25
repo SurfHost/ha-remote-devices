@@ -3,6 +3,9 @@ name: Validate
 on:
   push:
     branches: [main]
+    # Tags are matched so the release-gate job below actually gets a chance to
+    # run; without this a "git push --tags" would not trigger the workflow.
+    tags: ["v*"]
   pull_request:
 
 jobs:
@@ -11,7 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: hacs/action@main
+      # Pinned to a commit rather than @main: these actions can change under us
+      # at any time, and a silent upstream change should not be able to turn a
+      # green build red or a red build green.
+      - uses: hacs/action@1ebf01c408f29afcb6406bd431bc98fd8cbb15aa # main as of 2026-07-25, 15 commits past 22.5.0
         with:
           category: integration
 
@@ -20,4 +26,58 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: home-assistant/actions/hassfest@master
+      - uses: home-assistant/actions/hassfest@e3fb68ebda13d88a0d695082f471ba2c83d025fb # master as of 2026-07-25
+
+  lint:
+    name: Lint and type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+      # uv sync honours [tool.uv] package = false, so it installs the
+      # dependencies without trying to build this custom component as a wheel.
+      # It also fetches the Python that requires-python demands (>= 3.14.2,
+      # forced by the homeassistant floor), so no separate setup-python step.
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      # ruff and mypy both read their settings from pyproject.toml. No flags are
+      # passed here on purpose: CI must check exactly what a developer running
+      # "ruff check" or "mypy" locally checks.
+      - name: ruff check
+        run: uv run ruff check .
+
+      - name: ruff format --check
+        run: uv run ruff format --check .
+
+      - name: mypy
+        run: uv run mypy
+
+  # No test job: this repo has no tests/ directory. Add one here when it gets
+  # one, rather than inventing a green pytest run over nothing.
+
+  release-gate:
+    # Gate on the other jobs so a tag that fails lint or hassfest cannot
+    # look like a clean release in the checks list.
+    needs: [hacs, hassfest, lint]
+    name: Release gate (tag matches manifest version)
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+      # HACS serves the release named by the git tag but reports the version
+      # from manifest.json. When the two disagree users get a release that
+      # reports the wrong version and never sees the next update offer. Fail the
+      # tag push rather than shipping that.
+      - name: Compare tag against manifest version
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          manifest=$(ls custom_components/*/manifest.json)
+          manifest_version=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['version'])" "$manifest")
+          echo "git tag:          $tag"
+          echo "manifest version: $manifest_version"
+          if [ "$tag" != "v$manifest_version" ]; then
+            echo "::error::Tag '$tag' does not match $manifest version '$manifest_version' (expected tag 'v$manifest_version')."
+            exit 1
+          fi

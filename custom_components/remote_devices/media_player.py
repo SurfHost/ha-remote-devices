@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 
 from homeassistant.components import infrared
 from homeassistant.components.media_player import (
@@ -41,6 +42,7 @@ from .ir_commands import (
     make_samsung_command,
     make_sharp_tv_command,
 )
+from .version import integration_version
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -87,7 +89,7 @@ async def async_setup_entry(
         name=device_name,
         manufacturer="Remote Devices",
         model=DEVICE_TYPES.get(device_type, device_type),
-        sw_version="0.13.0",
+        sw_version=integration_version(hass),
     )
 
     # Power command names and entity presentation vary by device type. Denon has
@@ -133,7 +135,9 @@ class IRMediaPlayer(MediaPlayerEntity):
         self,
         config_entry: ConfigEntry,
         emitter_entity_id: str,
-        command_factory: object,
+        # Every make_*_command factory takes the command name and returns the
+        # command object, or None when that device has no code for the name.
+        command_factory: Callable[[str], object | None],
         device_info: DeviceInfo,
         power_on_command: str = "power",
         power_off_command: str = "power",
@@ -145,7 +149,7 @@ class IRMediaPlayer(MediaPlayerEntity):
 
         When ``supports_power`` is False the entity exposes only volume + mute
         (no turn on/off) and assumes an "on" state so the volume controls stay
-        active — used for devices with no IR power code (e.g. Audioengine A5+).
+        active > used for devices with no IR power code (e.g. Audioengine A5+).
         """
         self._emitter_entity_id = emitter_entity_id
         self._command_factory = command_factory
@@ -157,18 +161,11 @@ class IRMediaPlayer(MediaPlayerEntity):
         self._attr_device_info = device_info
         self._attr_is_volume_muted = False
 
-        features = (
-            MediaPlayerEntityFeature.VOLUME_STEP
-            | MediaPlayerEntityFeature.VOLUME_MUTE
-        )
+        features = MediaPlayerEntityFeature.VOLUME_STEP | MediaPlayerEntityFeature.VOLUME_MUTE
         if supports_power:
-            features |= (
-                MediaPlayerEntityFeature.TURN_ON | MediaPlayerEntityFeature.TURN_OFF
-            )
+            features |= MediaPlayerEntityFeature.TURN_ON | MediaPlayerEntityFeature.TURN_OFF
         self._attr_supported_features = features
-        self._attr_state = (
-            MediaPlayerState.OFF if supports_power else MediaPlayerState.ON
-        )
+        self._attr_state = MediaPlayerState.OFF if supports_power else MediaPlayerState.ON
 
     async def _send_command(self, command_name: str) -> None:
         """Send an IR command by name."""

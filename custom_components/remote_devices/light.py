@@ -29,6 +29,7 @@ from .const import (
     DOMAIN,
 )
 from .rf_commands import make_airwit_fan_command
+from .version import integration_version
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,16 +64,14 @@ async def async_setup_entry(
             name=device_name,
             manufacturer="Airwit",
             model="Plafondventilator",
-            sw_version="0.13.0",
+            sw_version=integration_version(hass),
         )
 
-    async_add_entities(
-        [AirwitLamp(config_entry, emitter_entity_id, device_info)]
-    )
+    async_add_entities([AirwitLamp(config_entry, emitter_entity_id, device_info)])
 
 
 class AirwitLamp(LightEntity):
-    """Airwit ceiling fan lamp — single toggle code, optimistic on/off."""
+    """Airwit ceiling fan lamp > single toggle code, optimistic on/off."""
 
     _attr_has_entity_name = True
     _attr_translation_key = "lamp"
@@ -80,7 +79,6 @@ class AirwitLamp(LightEntity):
     _attr_icon = "mdi:ceiling-light"
     _attr_assumed_state = True
     _attr_color_mode = ColorMode.ONOFF
-    _attr_supported_color_modes = {ColorMode.ONOFF}
 
     def __init__(
         self,
@@ -89,6 +87,10 @@ class AirwitLamp(LightEntity):
         device_info: DeviceInfo,
     ) -> None:
         """Initialize the Airwit lamp."""
+        # Set per instance rather than as a class attribute: a mutable set on
+        # the class is shared by every entity, so anything that mutated it
+        # would leak across entities.
+        self._attr_supported_color_modes = {ColorMode.ONOFF}
         self._emitter_entity_id = emitter_entity_id
         self._attr_unique_id = f"{config_entry.entry_id}_lamp"
         self._attr_device_info = device_info

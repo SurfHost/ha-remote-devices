@@ -9,7 +9,6 @@ from __future__ import annotations
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant.components import infrared, radio_frequency
 from homeassistant.components.radio_frequency import ModulationType
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
@@ -25,6 +24,7 @@ from homeassistant.helpers.selector import (
     SelectSelectorMode,
     TextSelector,
     TextSelectorConfig,
+    TextSelectorType,
 )
 
 from .const import (
@@ -75,9 +75,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
         """Initialise per-flow cache."""
         self._cache: dict[str, Any] = {}
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Step 1: choose setup mode."""
         if user_input is not None:
             if user_input["setup_mode"] == SETUP_MODE_ATTACH:
@@ -85,9 +83,9 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
             return await self.async_step_new_device()
 
         # Need at least one emitter (IR or RF) to do anything useful.
-        any_emitters = _get_emitters_for_protocol(
-            self.hass, "ir"
-        ) or _get_emitters_for_protocol(self.hass, "rf")
+        any_emitters = _get_emitters_for_protocol(self.hass, "ir") or _get_emitters_for_protocol(
+            self.hass, "rf"
+        )
         if not any_emitters:
             return self.async_abort(reason="no_emitters")
 
@@ -120,30 +118,25 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
         """Step 2 (new): pick device type and optional name."""
         if user_input is not None:
             self._cache[CONF_DEVICE_TYPE] = user_input[CONF_DEVICE_TYPE]
-            self._cache[CONF_DEVICE_NAME] = user_input.get(
-                CONF_DEVICE_NAME, ""
-            ).strip()
+            self._cache[CONF_DEVICE_NAME] = user_input.get(CONF_DEVICE_NAME, "").strip()
             return await self.async_step_select_emitter()
 
         device_options = [
-            SelectOptionDict(value=key, label=label)
-            for key, label in DEVICE_TYPES.items()
+            SelectOptionDict(value=key, label=label) for key, label in DEVICE_TYPES.items()
         ]
 
         return self.async_show_form(
             step_id="new_device",
             data_schema=vol.Schema(
                 {
-                    vol.Required(
-                        CONF_DEVICE_TYPE, default="nec_tv"
-                    ): SelectSelector(
+                    vol.Required(CONF_DEVICE_TYPE, default="nec_tv"): SelectSelector(
                         SelectSelectorConfig(
                             options=device_options,
                             mode=SelectSelectorMode.DROPDOWN,
                         )
                     ),
                     vol.Optional(CONF_DEVICE_NAME, default=""): TextSelector(
-                        TextSelectorConfig(type="text")
+                        TextSelectorConfig(type=TextSelectorType.TEXT)
                     ),
                 }
             ),
@@ -162,9 +155,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
                 device_type, "Remote Device"
             )
 
-            await self.async_set_unique_id(
-                f"{entity_id}_{device_type}_{device_name}"
-            )
+            await self.async_set_unique_id(f"{entity_id}_{device_type}_{device_name}")
             self._abort_if_unique_id_configured()
 
             return self.async_create_entry(
@@ -186,9 +177,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="select_emitter",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_EMITTER_ENTITY_ID): _emitter_selector(
-                        emitters, protocol
-                    ),
+                    vol.Required(CONF_EMITTER_ENTITY_ID): _emitter_selector(emitters, protocol),
                 }
             ),
             description_placeholders={
@@ -197,9 +186,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
             },
         )
 
-    async def async_step_attach(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_attach(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Attach: pick device and device type, then emitter."""
         if user_input is not None:
             self._cache[CONF_ATTACH_TO_DEVICE] = user_input[CONF_ATTACH_TO_DEVICE]
@@ -221,9 +208,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
                             entity=[{"domain": "media_player"}],
                         )
                     ),
-                    vol.Required(
-                        CONF_DEVICE_TYPE, default="nec_tv"
-                    ): SelectSelector(
+                    vol.Required(CONF_DEVICE_TYPE, default="nec_tv"): SelectSelector(
                         SelectSelectorConfig(
                             options=device_options,
                             mode=SelectSelectorMode.DROPDOWN,
@@ -248,9 +233,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
             dev_entry = dev_reg.async_get(device_id)
             device_name = dev_entry.name if dev_entry else device_id
 
-            await self.async_set_unique_id(
-                f"{entity_id}_{device_type}_attach_{device_id}"
-            )
+            await self.async_set_unique_id(f"{entity_id}_{device_type}_attach_{device_id}")
             self._abort_if_unique_id_configured()
 
             return self.async_create_entry(
@@ -273,9 +256,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="attach_select_emitter",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_EMITTER_ENTITY_ID): _emitter_selector(
-                        emitters, protocol
-                    ),
+                    vol.Required(CONF_EMITTER_ENTITY_ID): _emitter_selector(emitters, protocol),
                 }
             ),
             description_placeholders={
@@ -290,7 +271,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
         """Reconfigure: change emitter, device type, and name.
 
         Both standalone and attach entries render the same field order:
-        Emitter → Target Device (attach only) → Device Type → Device Name.
+        Emitter > Target Device (attach only) > Device Type > Device Name.
         Device Name is editable in both modes; if left blank it falls back to
         the target device's name (attach) or the device type label (standalone).
         """
@@ -335,7 +316,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
                 reason="reconfigure_successful",
             )
 
-        # Reconfigure shows both IR and RF emitters — user picks the one matching
+        # Reconfigure shows both IR and RF emitters > user picks the one matching
         # the device type they (re-)select.
         ir_emitters = _get_emitters_for_protocol(self.hass, "ir")
         rf_emitters = _get_emitters_for_protocol(self.hass, "rf")
@@ -360,7 +341,7 @@ class RemoteDevicesConfigFlow(ConfigFlow, domain=DOMAIN):
                 mode=SelectSelectorMode.DROPDOWN,
             )
         )
-        device_name_selector = TextSelector(TextSelectorConfig(type="text"))
+        device_name_selector = TextSelector(TextSelectorConfig(type=TextSelectorType.TEXT))
 
         # Same field order for both modes; attach entries additionally show the
         # Target Device field (inherent to attach mode) after the emitter.

@@ -30,6 +30,7 @@ from .const import (
     DOMAIN,
 )
 from .rf_commands import make_airwit_fan_command
+from .version import integration_version
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -83,12 +84,10 @@ async def async_setup_entry(
             name=device_name,
             manufacturer="Airwit",
             model="Plafondventilator",
-            sw_version="0.13.0",
+            sw_version=integration_version(hass),
         )
 
-    async_add_entities(
-        [AirwitFan(config_entry, emitter_entity_id, device_info)]
-    )
+    async_add_entities([AirwitFan(config_entry, emitter_entity_id, device_info)])
 
 
 class AirwitFan(FanEntity):
@@ -107,7 +106,6 @@ class AirwitFan(FanEntity):
         | FanEntityFeature.DIRECTION
     )
     _attr_speed_count = AIRWIT_SPEED_COUNT
-    _attr_preset_modes = [PRESET_NATURAL_WIND]
 
     def __init__(
         self,
@@ -116,6 +114,10 @@ class AirwitFan(FanEntity):
         device_info: DeviceInfo,
     ) -> None:
         """Initialize the Airwit fan."""
+        # Set per instance rather than as a class attribute: a mutable list on
+        # the class is shared by every entity, so anything that mutated it
+        # would leak across entities.
+        self._attr_preset_modes = [PRESET_NATURAL_WIND]
         self._emitter_entity_id = emitter_entity_id
         self._attr_unique_id = f"{config_entry.entry_id}_fan"
         self._attr_device_info = device_info
@@ -159,11 +161,7 @@ class AirwitFan(FanEntity):
             self._attr_preset_mode = PRESET_NATURAL_WIND
             self._attr_percentage = None
         else:
-            speed = (
-                _percentage_to_speed(percentage)
-                if percentage is not None
-                else self._last_speed
-            )
+            speed = _percentage_to_speed(percentage) if percentage is not None else self._last_speed
             speed = max(1, speed)
             await self._send(SPEED_TO_CODE[speed])
             self._attr_percentage = _speed_to_percentage(speed)

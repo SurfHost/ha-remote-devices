@@ -39,9 +39,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     attach_device_id = entry.data.get(CONF_ATTACH_TO_DEVICE)
     if attach_device_id:
         dev_reg = dr.async_get(hass)
-        dev_reg.async_update_device(
-            attach_device_id, add_config_entry_id=entry.entry_id
-        )
+        dev_reg.async_update_device(attach_device_id, add_config_entry_id=entry.entry_id)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True

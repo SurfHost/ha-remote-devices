@@ -1,0 +1,106 @@
+[project]
+name = "ha-remote-devices"
+version = "0.14.0"
+description = "IR/RF remote device entities for Home Assistant on top of the infrared and radio_frequency platforms"
+# 3.14.2 is forced, not chosen: the homeassistant floor below (2026.5.0, matching
+# hacs.json) itself declares Requires-Python >= 3.14.2, so anything lower makes
+# the dependency set unresolvable.
+requires-python = ">=3.14.2"
+license = "MIT"
+
+dependencies = [
+    # The infrared entity platform landed in HA 2026.4 and radio_frequency in
+    # 2026.5; manifest.json declares both as dependencies, so 2026.5.0 is the
+    # real floor and matches the homeassistant version in hacs.json.
+    "homeassistant>=2026.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "homeassistant-stubs",
+    "mypy",
+    "pre-commit",
+    "pylint",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-homeassistant-custom-component",
+    "ruff",
+    "codespell",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+# HA custom component > nothing to build/install as a wheel
+package = false
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "W",
+    "I",
+    "UP",
+    "B",
+    "SIM",
+    "T20",
+    "RUF",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# const.py stores Broadlink-learned IR/RF packets as single base64 string
+# literals, up to ~1000 characters each. They cannot be wrapped without
+# changing the payload, so E501 is unenforceable there. Everything else in
+# the repo is held to line-length 100.
+"custom_components/remote_devices/const.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+# Named here so CI and a bare local "mypy" check the same set. Nothing is
+# skipped: every shipped module is type checked.
+files = ["custom_components"]
+
+# infrared-protocols and rf-protocols are the upstream libraries that HA's
+# infrared / radio_frequency components re-export their command ABCs from.
+# Neither ships a py.typed marker, so mypy cannot see into them whether or not
+# they are installed. Nothing downstream can fix that.
+[[tool.mypy.overrides]]
+module = [
+    "infrared_protocols.*",
+    "rf_protocols.*",
+]
+ignore_missing_imports = true
+
+# homeassistant.components.radio_frequency does `from rf_protocols import
+# ModulationType, RadioFrequencyCommand` but only lists ModulationType in its
+# __all__, so strict mode's no_implicit_reexport refuses the second name even
+# though it is the documented way for a consumer to get the command ABC. This
+# relaxes re-export checking for that one upstream module only, and needs no
+# follow-up if HA later adds the name to __all__.
+[[tool.mypy.overrides]]
+module = ["homeassistant.components.radio_frequency"]
+implicit_reexport = true
+
+# Consequence of the above: InfraredCommand and RadioFrequencyCommand both
+# resolve to Any, so strict mode's disallow_subclassing_any rejects our command
+# classes. These three modules are the only ones that subclass those ABCs, and
+# the exemption is limited to that single check > everything else in them is
+# still checked under full strict mode. Drop this block once the upstream
+# libraries ship type information.
+[[tool.mypy.overrides]]
+module = [
+    "remote_devices.nec",
+    "remote_devices.sharp",
+    "remote_devices.rf_commands",
+]
+disallow_subclassing_any = false

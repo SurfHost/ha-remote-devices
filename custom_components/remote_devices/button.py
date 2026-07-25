@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
+from functools import partial
 from typing import Any
 
 from homeassistant.components import infrared, radio_frequency
@@ -58,6 +59,7 @@ from .ir_commands import (
     make_tristar_ac_command,
 )
 from .rf_commands import make_airwit_fan_command
+from .version import integration_version
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -154,7 +156,7 @@ async def async_setup_entry(
             name=device_name,
             manufacturer="Remote Devices",
             model=DEVICE_TYPES.get(device_type, device_type),
-            sw_version="0.13.0",
+            sw_version=integration_version(hass),
         )
 
     protocol = DEVICE_PROTOCOLS.get(device_type, "ir")
@@ -169,7 +171,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_lg_command(name),
+                    command_factory=partial(make_lg_command, cmd_name),
                     device_info=device_info,
                 )
             )
@@ -180,7 +182,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_samsung_command(name),
+                    command_factory=partial(make_samsung_command, cmd_name),
                     device_info=device_info,
                 )
             )
@@ -191,7 +193,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_sharp_tv_command(name),
+                    command_factory=partial(make_sharp_tv_command, cmd_name),
                     device_info=device_info,
                 )
             )
@@ -202,7 +204,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_denon_avr_command(name),
+                    command_factory=partial(make_denon_avr_command, cmd_name),
                     device_info=device_info,
                 )
             )
@@ -213,9 +215,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_tristar_ac_command(
-                        name
-                    ),
+                    command_factory=partial(make_tristar_ac_command, cmd_name),
                     device_info=device_info,
                 )
             )
@@ -226,9 +226,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_audioengine_a5_command(
-                        name
-                    ),
+                    command_factory=partial(make_audioengine_a5_command, cmd_name),
                     device_info=device_info,
                 )
             )
@@ -239,7 +237,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_philips_lamp_command(name),
+                    command_factory=partial(make_philips_lamp_command, cmd_name),
                     device_info=device_info,
                 )
             )
@@ -250,7 +248,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_amino_stb_command(name),
+                    command_factory=partial(make_amino_stb_command, cmd_name),
                     device_info=device_info,
                 )
             )
@@ -273,7 +271,7 @@ async def async_setup_entry(
                     config_entry=config_entry,
                     emitter_entity_id=emitter_entity_id,
                     command_name=cmd_name,
-                    command_factory=lambda name=cmd_name: make_airwit_fan_command(name),
+                    command_factory=partial(make_airwit_fan_command, cmd_name),
                     device_info=device_info,
                 )
             )
