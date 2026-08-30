@@ -5,6 +5,21 @@ All notable changes to the Remote Devices integration will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2026-08-30
+
+### Fixed
+- **The Airwit lamp now switches on and off reliably, and the dimmer buttons work.** Three things were wrong at once.
+- The stored `lamp` packet was a bad learn: decoded frame by frame it transmitted five frames of `fan_direction`, two of lamp and one of `fan_4`, so the receiver acted on the fan direction rather than the light. Replaced with a clean recording.
+- Every RF packet was transmitted with a burst of noise in front of it and its first frame mutilated. An RM4 Pro answers an RF learn with type byte `0xb1`, not the documented `0xb2`, and in a `0xb1` packet bytes 4 to 7 hold the carrier frequency in kHz, so the pulses only start at byte 8. Reading those four bytes as pulse lengths invented a 6.8 ms carrier burst, a 5.2 ms gap and a 0.2 ms blip, and the `0x00` escape rule then swallowed the first real pulse pair. The decoder now recognises `0xb1`. IR is unaffected: those packets are type `0x26`.
+- The remote steps a 3-bit counter in the payload down by one on every press, cycling 7, 6, 5, 4, 3, 2, 1, 0, so two of its presses are never identical on air and the receiver reads each one as fresh. Replaying one fixed packet only ever worked once. The lamp and both dimmer buttons now walk the full cycle. One press is one dim step, as on the remote.
+
+### Added
+- The lamp is a Klik button, matching the hardware: one button that toggles, with nothing reported back.
+- Sends are serialised per emitter. A Broadlink answers one request at a time, but the `radio_frequency` platform declares `PARALLEL_UPDATES = 0` and sends straight through, so two presses that overlap both fail with a five second network timeout.
+
+### Changed
+- Airwit packets are verified against the original remote: same frames, same words, same pulse widths, same duration to the microsecond.
+
 ## [0.14.0] - 2026-07-12
 
 ### Changed

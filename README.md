@@ -3,7 +3,7 @@
 [![Validate](https://github.com/SurfHost/ha-remote-devices/actions/workflows/validate.yml/badge.svg)](https://github.com/SurfHost/ha-remote-devices/actions/workflows/validate.yml)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 
-Custom Home Assistant integration that creates **button**, **media_player**, **fan**, and **light** entities to control IR and RF devices through the Home Assistant 2026.5 `infrared` and `radio_frequency` platforms.
+Custom Home Assistant integration that creates **button**, **media_player**, and **fan** entities to control IR and RF devices through the Home Assistant 2026.5 `infrared` and `radio_frequency` platforms.
 
 ## What does this do?
 
@@ -13,7 +13,6 @@ Set it up, pick your device type, pick the matching emitter (the integration fil
 
 - A **media_player** entity for TVs and AV receivers (power, volume, mute)
 - A **fan** entity for ceiling fans (speed, preset modes, direction)
-- A **light** entity for lamps (on/off)
 - **Button** entities for everything else
 - Option to **attach to an existing device** (like Battery Notes does) instead of creating a separate one
 - **Reconfigure** support — change emitter, type, or name after setup
@@ -31,7 +30,7 @@ Set it up, pick your device type, pick the matching emitter (the integration fil
 | Philips RGBIC Lamp | IR — NEC (addr 0x00) | 11 buttons |
 | Amino Kamai 7X STB | IR — RC6 (raw learned) | 8 buttons |
 | Raw Test | IR — raw burst | 1 button |
-| Airwit Plafondventilator | RF 433 MHz — raw learned | fan + light + 3 buttons |
+| Airwit Plafondventilator | RF 433 MHz — raw learned | fan + 4 buttons |
 
 ## Requirements
 
@@ -74,11 +73,12 @@ Or manually:
 
 ## Airwit Plafondventilator
 
-The Airwit ceiling fan is exposed as **three entities under one device**, so you get HA-native control:
+The Airwit ceiling fan is exposed as **one fan entity plus four buttons, under one device**, so you get HA-native control:
 
 - `fan.airwit_plafondventilator` — speeds 1-6 (mapped to 17%/33%/50%/67%/83%/100%), `natural_wind` preset, forward/reverse direction
-- `light.airwit_plafondventilator_lamp` — on/off (lamp is a single toggle code; state is optimistic)
-- 3 buttons: `brightness_up`, `brightness_down`, `all_off`
+- 4 buttons: `lamp`, `brightness_up`, `brightness_down`, `all_off`
+
+The lamp is one toggle button on the hardware and reports nothing back, so it is a Klik button here too: every press sends the same on/off code the original remote sends. Press it, the lamp changes state; press again, it changes back. Use `button.press` from automations.
 
 This means voice assistants ("Alexa, set ceiling fan to medium"), Lovelace fan/light cards, scenes, and standard automations all work without scripts.
 

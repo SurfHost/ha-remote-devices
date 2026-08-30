@@ -11,13 +11,19 @@ returns the cached instance.
 
 from __future__ import annotations
 
+from itertools import cycle
+
 from homeassistant.components.radio_frequency import (
     ModulationType,
     RadioFrequencyCommand,
 )
 
 from .broadlink_decode import decode_broadlink_b64_to_timings
-from .const import AIRWIT_FAN_BROADLINK_RF_CODES, AIRWIT_FAN_FREQUENCY_HZ
+from .const import (
+    AIRWIT_FAN_BROADLINK_RF_CODES,
+    AIRWIT_FAN_COUNTER_CYCLES,
+    AIRWIT_FAN_FREQUENCY_HZ,
+)
 
 
 class RawBroadlinkRFCommand(RadioFrequencyCommand):
@@ -35,7 +41,7 @@ class RawBroadlinkRFCommand(RadioFrequencyCommand):
             modulation=ModulationType.OOK,
             repeat_count=repeat_count,
         )
-        # RF signals contain long internal gaps (sync→data) that are NOT
+        # RF signals contain long internal gaps (sync to data) that are NOT
         # repeat-frame boundaries. Decode the full packet without stripping.
         self._timings = decode_broadlink_b64_to_timings(b64_code, strip_repeats=False)
 
@@ -50,6 +56,21 @@ AIRWIT_FAN_COMMANDS: dict[str, RawBroadlinkRFCommand] = {
 }
 
 
+# Buttons that must never be replayed identically twice: see
+# AIRWIT_FAN_COUNTER_CYCLES. Pre-decoded once, then handed out in turn.
+_AIRWIT_CYCLES = {
+    name: cycle(tuple(RawBroadlinkRFCommand(b64) for b64 in codes))
+    for name, codes in AIRWIT_FAN_COUNTER_CYCLES.items()
+}
+
+
 def make_airwit_fan_command(name: str) -> RawBroadlinkRFCommand | None:
-    """Return the cached RF command for the named Airwit button, or None."""
+    """Return the RF command for the named Airwit button, or None.
+
+    Most buttons replay one fixed packet. The lamp and the two dimmer buttons
+    walk the remote's counter sequence instead, so that two presses in a row
+    are never identical and the receiver reads each one as a fresh press.
+    """
+    if (cycled := _AIRWIT_CYCLES.get(name)) is not None:
+        return next(cycled)
     return AIRWIT_FAN_COMMANDS.get(name)

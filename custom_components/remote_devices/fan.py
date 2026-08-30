@@ -11,7 +11,6 @@ import logging
 import math
 from typing import Any
 
-from homeassistant.components import radio_frequency
 from homeassistant.components.fan import FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -29,6 +28,7 @@ from .const import (
     DEVICE_TYPES,
     DOMAIN,
 )
+from .emitter import async_send_rf
 from .rf_commands import make_airwit_fan_command
 
 _LOGGER = logging.getLogger(__name__)
@@ -132,7 +132,7 @@ class AirwitFan(FanEntity):
             _LOGGER.error("Unknown Airwit command: %s", name)
             return
         try:
-            await radio_frequency.async_send_command(
+            await async_send_rf(
                 self.hass,
                 self._emitter_entity_id,
                 command,

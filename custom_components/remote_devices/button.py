@@ -10,7 +10,6 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
-from homeassistant.components import infrared, radio_frequency
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -46,6 +45,7 @@ from .const import (
     SHARP_TV_COMMANDS,
     TRISTAR_AC_COMMANDS,
 )
+from .emitter import async_send_ir, async_send_rf
 from .ir_commands import (
     make_amino_stb_command,
     make_audioengine_a5_command,
@@ -120,6 +120,7 @@ BUTTON_ICONS = {
     "forward": "mdi:fast-forward",
     "rewind": "mdi:rewind",
     "all_off": "mdi:power-off",
+    "lamp": "mdi:ceiling-light",
     "temp_up": "mdi:thermometer-plus",
     "temp_down": "mdi:thermometer-minus",
     "speed": "mdi:fan",
@@ -266,8 +267,10 @@ async def async_setup_entry(
         )
     elif device_type == DEVICE_TYPE_AIRWIT_FAN:
         # Fan entity covers Fan1-6 + natural_wind + fan_off + direction.
-        # Light entity covers lamp toggle. Buttons just for the rest.
-        for cmd_name in ("brightness_up", "brightness_down", "all_off"):
+        # The lamp is one toggle button on the hardware with nothing reported
+        # back, so it is a Klik button here too: every press sends the toggle,
+        # exactly like the original remote.
+        for cmd_name in ("lamp", "brightness_up", "brightness_down", "all_off"):
             entities.append(
                 button_cls(
                     config_entry=config_entry,
@@ -336,7 +339,7 @@ class IRButton(_RemoteButtonBase):
     """Button that sends an IR command via the infrared platform."""
 
     async def _send(self, command: Any) -> None:
-        await infrared.async_send_command(
+        await async_send_ir(
             self.hass,
             self._emitter_entity_id,
             command,
@@ -348,7 +351,7 @@ class RFButton(_RemoteButtonBase):
     """Button that sends an RF command via the radio_frequency platform."""
 
     async def _send(self, command: Any) -> None:
-        await radio_frequency.async_send_command(
+        await async_send_rf(
             self.hass,
             self._emitter_entity_id,
             command,

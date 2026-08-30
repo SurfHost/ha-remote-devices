@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.components import infrared
 from homeassistant.components.media_player import (
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
@@ -34,6 +33,7 @@ from .const import (
     DEVICE_TYPES,
     DOMAIN,
 )
+from .emitter import async_send_ir
 from .ir_commands import (
     make_audioengine_a5_command,
     make_denon_avr_command,
@@ -180,7 +180,7 @@ class IRMediaPlayer(MediaPlayerEntity):
         _LOGGER.debug("Media player sending '%s'", command_name)
 
         try:
-            await infrared.async_send_command(
+            await async_send_ir(
                 self.hass,
                 self._emitter_entity_id,
                 command,
