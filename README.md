@@ -1,7 +1,7 @@
 # Remote Devices
 
 [![Validate](https://github.com/SurfHost/ha-remote-devices/actions/workflows/validate.yml/badge.svg)](https://github.com/SurfHost/ha-remote-devices/actions/workflows/validate.yml)
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Custom_repository-41BDF5.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=SurfHost&repository=ha-remote-devices&category=integration)
 
 Custom Home Assistant integration that creates **button**, **media_player**, and **fan** entities to control IR and RF devices through the Home Assistant 2026.5 `infrared` and `radio_frequency` platforms.
 
@@ -39,17 +39,21 @@ Set it up, pick your device type, pick the matching emitter (the integration fil
 
 ## Installation
 
-### HACS (Recommended)
+### Marketplace (recommended)
 
-[![Add Repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=SurfHost&repository=ha-remote-devices&category=integration)
+Since Home Assistant 2026.11, HACS is built into Home Assistant as the **Marketplace**. An existing HACS installation of this integration moves over by itself and keeps receiving updates.
+
+[![Open your Home Assistant instance and open this repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=SurfHost&repository=ha-remote-devices&category=integration)
 
 Or manually:
 
-1. Open HACS in Home Assistant
-2. Click the three dots in the top right and select **Custom repositories**
-3. Add this repository URL and select **Integration** as category
-4. Click **Download**
+1. Go to **Settings > Marketplace**
+2. Open the menu and choose **Custom repositories**
+3. Add `SurfHost/ha-remote-devices` with category **Integration**
+4. Search for "Remote Devices" and install
 5. Restart Home Assistant
+
+On Home Assistant before 2026.11, use HACS the same way.
 
 ### Manual
 
